@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Checkin</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Inicio de sesión</string>
+    
+    <!-- Login's string resources -->
+    <string name="prompt_username_crm">Usuario CRM</string>
+    <string name="prompt_username">Usuario app</string>
+    <string name="prompt_password_crm">Contraseña CRM</string>
+    <string name="prompt_password">Contraseña app</string>
+    <string name="action_sign_in">Iniciar sesión</string>
+    <string name="error_field_required">Este campo es requerido</string>
+    <string name="error_invalid_user_crm">Usuario de crm inválido</string>
+    <string name="error_invalid_user_app">Usuario de app inválido</string>
+    <string name="error_network">No hay conexión de datos</string>
+</resources>
