@@ -1,7 +1,9 @@
 package com.mayantech.checkin.data.api;
 
-import com.mayantech.checkin.data.api.model.Asesor;
-import com.mayantech.checkin.data.api.model.LoginBody;
+import com.mayantech.checkin.data.api.model.login.LoginBody;
+import com.mayantech.checkin.data.api.model.login.LoginResponse;
+import com.mayantech.checkin.data.api.model.visita.VisitaResponse;
+import com.mayantech.checkin.data.api.model.visita.VisitasBody;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -18,6 +20,9 @@ public interface CheckinApi {
     public static final String BASE_URL = "http://104.130.143.72:8080/ncomercial/app-rest/";
 
     @POST("autenticacion/")
-    Call<Asesor> login(@Body LoginBody loginBody);
+    Call<LoginResponse> autenticacion(@Body LoginBody loginBody);
+
+    @POST("get_visitas/")
+    Call<VisitaResponse> getVisitas(@Body VisitasBody visitasBody);
 
 }

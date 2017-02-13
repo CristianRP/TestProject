@@ -1,4 +1,4 @@
-package com.mayantech.checkin.data.api.model;
+package com.mayantech.checkin.data.api.model.login;
 
 import com.google.gson.annotations.SerializedName;
 

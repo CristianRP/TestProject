@@ -5,31 +5,34 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mayantech.checkin.R;
 import com.mayantech.checkin.data.api.CheckinApi;
 import com.mayantech.checkin.data.api.model.ApiError;
-import com.mayantech.checkin.data.api.model.Asesor;
-import com.mayantech.checkin.data.api.model.LoginBody;
+import com.mayantech.checkin.data.api.model.login.LoginBody;
+import com.mayantech.checkin.data.api.model.login.LoginResponse;
 import com.mayantech.checkin.data.prefs.SessionPrefs;
+import com.mayantech.checkin.util.Encryptor;
+
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private Retrofit mRestAdapter;
     private CheckinApi mCheckinApi;
+    private static final String key_encrypt = "$C0w3Rc!4L@pPVst";
 
     @BindView(R.id.login_progress)
     ProgressBar mProgressView;
@@ -67,6 +71,8 @@ public class LoginActivity extends AppCompatActivity {
     LinearLayout mLinearLogin;
     @BindView(R.id.login_form)
     ScrollView mLoginFormView;
+    @BindView(R.id.contentLogin)
+    CoordinatorLayout mContentLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,42 +80,19 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .build();
+
         mRestAdapter = new Retrofit.Builder()
-                .baseUrl(CheckinApi.BASE_URL)
+                .baseUrl(mCheckinApi.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
         mCheckinApi = mRestAdapter.create(CheckinApi.class);
-
-        mPasswordCrmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    if (!isOnline()) {
-                        showLoginError(getString(R.string.error_network));
-                        return false;
-                    }
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    if (!isOnline()) {
-                        showLoginError(getString(R.string.error_network));
-                        return false;
-                    }
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,6 +108,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void attemptLogin() {
+        // Instacia de la clase Ecryptor para las contraseñas
+        Encryptor encryptor = new Encryptor();
+
         // Reset errors
         mFloatLabelUserCrm.setError(null);
         mFloatLabelPasswordCrm.setError(null);
@@ -133,9 +119,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Store values at the time of the login attempt
         String user_crm = mUserCrmView.getText().toString();
-        String password_crm = mPasswordCrmView.getText().toString();
+        String password_crm = encryptor.encrypt(mPasswordCrmView.getText().toString(), key_encrypt);
         String user_app = mUserView.getText().toString();
-        String password_app = mPasswordView.getText().toString();
+        String password_app = encryptor.encrypt(mPasswordView.getText().toString(), key_encrypt);
 
         boolean cancel = false;
         View focusView = null;
@@ -191,44 +177,13 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Muestra el inidicador de carga y luego inicia la petición asincrona
             showProgress(true);
-            Call<Asesor> loginCall = mCheckinApi.login(new LoginBody(user_crm,
-                    password_crm, user_app, password_app));
-            loginCall.enqueue(new Callback<Asesor>() {
-                @Override
-                public void onResponse(Call<Asesor> call, Response<Asesor> response) {
-                    // Ocultar progreso
-                    showProgress(false);
-                    // Procesar errores
-                    if (!response.isSuccessful()) {
-                        String error;
-                        if (response.errorBody()
-                                .contentType()
-                                .subtype()
-                                .equals("application/json")) {
-                            ApiError apiError = ApiError.fromResponseBody(response.errorBody());
-                            error = apiError.getMessage();
-                            Log.d("LoginActivity", apiError.getDeveloperMessage());
-                        } else {
-                            error = response.message();
-                        }
-                        showLoginError(error);
-                        return;
-                    }
-
-                    // Guarda el asesor en las preferencias
-                    SessionPrefs.get(LoginActivity.this).saveAsesor(response.body());
-                    Log.e("LoginAcitivity", "inicio con exito " + response.body());
-                    // Show listado par de visitas
-                    showListadoParVisitas();
-
-                }
-
-                @Override
-                public void onFailure(Call<Asesor> call, Throwable t) {
-                    showProgress(false);
-                    showLoginError(t.getMessage());
-                }
-            });
+            LoginBody loginBody = new LoginBody(
+                    user_crm,
+                    password_crm,
+                    user_app,
+                    password_app
+            );
+            LoginRequest(loginBody, user_crm, password_crm, user_app, password_app);
         }
 
 
@@ -275,4 +230,67 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Petición echa con REtrofit, para la autenticación
+     * del usuario
+     */
+    private void LoginRequest(LoginBody body, final String user_crm, final String pass_crm,
+                              final String user_app, final String pass_app) {
+        Call<LoginResponse> loginResponseCall = mCheckinApi.autenticacion(body);
+        loginResponseCall.enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                showProgress(false);
+                if (!response.isSuccessful()) {
+                    String error = "Ha ocurrido un error";
+                    if (response.errorBody()
+                            .contentType()
+                            .subtype()
+                            .equals("json")) {
+                        ApiError apiError = ApiError.fromResponseBody(response.errorBody());
+                        error = apiError.getMessage();
+                        showLoginError(error);
+                        Log.e("LoginActivity", " " + apiError.getMessage() +
+                                " api " + apiError.getResponse()) ;
+                    } else {
+                        // Reportar causas de error no relacionadas con la API
+                        showLoginError(error);
+                        Log.e("LoginActivity", " " + response.errorBody().toString());
+                    }
+                }
+
+                LoginResponse loginResponse =  new LoginResponse(
+                        response.body().getMessage(),
+                        response.body().getResponse(),
+                        response.body().getAsesor()
+                );
+
+                if (loginResponse.getResponse().equals("FAIL") ||
+                        loginResponse.getResponse().equals("UNKNOWN")) {
+                    Snackbar.make(mContentLogin, "Revisa tus datos", Snackbar.LENGTH_LONG)
+                            .setAction("Ok", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                }
+                            }).show();
+                } else {
+                    SessionPrefs.get(LoginActivity.this).saveDataPref(
+                            response.body().getAsesor(),
+                            user_crm,
+                            pass_crm,
+                            user_app,
+                            pass_app,
+                            response.body().getResponse()
+                            );
+                    showListadoParVisitas();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                Log.e("retrofit-login", "Autenticación fallida " + t.getMessage());
+            }
+        });
+    }
 }

@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:id="@+id/contentLogin"
     tools:context="com.mayantech.checkin.ui.LoginActivity">
 
     <include layout="@layout/content_login" />

@@ -24,7 +24,12 @@
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Login"></activity>
+            android:theme="@style/AppTheme.Login" />
+        <activity
+            android:screenOrientation="landscape"
+            android:name=".ui.DetalleVisitaActivity"
+            android:label="@string/title_activity_detalle_visita"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

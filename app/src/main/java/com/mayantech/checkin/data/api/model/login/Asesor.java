@@ -1,4 +1,6 @@
-package com.mayantech.checkin.data.api.model;
+package com.mayantech.checkin.data.api.model.login;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Cristian Ramírez on 22/01/2017.
@@ -8,8 +10,11 @@ package com.mayantech.checkin.data.api.model;
 
 public class Asesor {
 
+    @SerializedName("id_consultor")
     private int id_consultor;
+    @SerializedName("nombre")
     private String nombre;
+    @SerializedName("codigo")
     private String codigo;
 
     public Asesor() {

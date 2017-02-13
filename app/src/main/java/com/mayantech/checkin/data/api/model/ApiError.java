@@ -13,34 +13,14 @@ import okhttp3.ResponseBody;
  */
 
 public class ApiError {
-    private int status;
-    private int code;
     private String message;
-    private String moreInfo;
-    private String developerMessage;
+    private String response;
+    private String asesor;
 
-    public ApiError(int status, int code, String message, String moreInfo, String developerMessage) {
-        this.status = status;
-        this.code = code;
+    public ApiError(String message, String response, String asesor) {
         this.message = message;
-        this.moreInfo = moreInfo;
-        this.developerMessage = developerMessage;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
+        this.response = response;
+        this.asesor = asesor;
     }
 
     public String getMessage() {
@@ -51,20 +31,20 @@ public class ApiError {
         this.message = message;
     }
 
-    public String getMoreInfo() {
-        return moreInfo;
+    public String getResponse() {
+        return response;
     }
 
-    public void setMoreInfo(String moreInfo) {
-        this.moreInfo = moreInfo;
+    public void setResponse(String response) {
+        this.response = response;
     }
 
-    public String getDeveloperMessage() {
-        return developerMessage;
+    public String getAsesor() {
+        return asesor;
     }
 
-    public void setDeveloperMessage(String developerMessage) {
-        this.developerMessage = developerMessage;
+    public void setAsesor(String asesor) {
+        this.asesor = asesor;
     }
 
     public static ApiError fromResponseBody(ResponseBody responseBody) {
