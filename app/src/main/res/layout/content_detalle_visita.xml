@@ -45,9 +45,38 @@
                 android:id="@+id/tvFechaInicio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fecha inicio: 2017-02-16 06:00:00"
+                android:text="Fecha inicio: 16-02-2017"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
+            <TextView
+                android:text="Hora inicio: 06:00"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView"
+                android:layout_weight="1" />
+
+
+            <LinearLayout
+                android:gravity="bottom"
+                android:layout_gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:text="Checkin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnCheckin"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:text="Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnSalida"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -68,9 +97,10 @@
 
                 <com.google.android.gms.maps.MapView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="250dp"
                     android:id="@+id/mapView"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:apiKey="@string/google_maps_key" />
             </LinearLayout>
 
         </ScrollView>

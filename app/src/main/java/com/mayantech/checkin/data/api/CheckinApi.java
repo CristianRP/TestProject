@@ -2,6 +2,8 @@ package com.mayantech.checkin.data.api;
 
 import com.mayantech.checkin.data.api.model.login.LoginBody;
 import com.mayantech.checkin.data.api.model.login.LoginResponse;
+import com.mayantech.checkin.data.api.model.vehiculo.VehiculoBody;
+import com.mayantech.checkin.data.api.model.vehiculo.VehiculoResponse;
 import com.mayantech.checkin.data.api.model.visita.VisitaResponse;
 import com.mayantech.checkin.data.api.model.visita.VisitasBody;
 
@@ -24,5 +26,8 @@ public interface CheckinApi {
 
     @POST("get_visitas/")
     Call<VisitaResponse> getVisitas(@Body VisitasBody visitasBody);
+
+    @POST("get_vehiculos/")
+    Call<VehiculoResponse> getVehiculos(@Body VehiculoBody vehiculoBody);
 
 }
